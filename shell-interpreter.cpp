@@ -1,28 +1,17 @@
 //ENGG 126
 //Project 1: Rudimentary Shell Interpreter
 //by: Iris Carson, Antonio Castro, and Joshua Kempis
-
+//--------------------------------------------------------------------
 #include <iostream>
 #include <string>
 #include <sstream>
 #include <fstream>
+#include <vector>
 #include <filesystem>
 #include <unistd.h>
 #include <windows.h>
-/*
-#include <vector>
-#include <direct.h>
-*/
-using namespace std;
-//using namespace std::filesystem;
 
-void helpCMD ()
-{
-  cout<<"\nLists of possible commands: \n"
-      <<"* help            - displays the lists of commands \n"
-      <<"* ls              - list all files and directories in the present working directory\n"
-      <<"* exit            - closes the program"<<endl;
-}
+using namespace std;
 
 void fileRead (string filename)
 {
@@ -51,37 +40,88 @@ void getCurrDir (string &cDir)
 {
   char tmp[256];
   getcwd (tmp, 256);
-  cout<<"Current working directory: "<< tmp << endl;
+  //cout<<"Current working directory: "<< tmp << endl;
   cDir = tmp;
+}
+
+string exec(string command) 
+{
+  char buffer[128];
+  string result = "";
+
+  // Open pipe to file
+  FILE* pipe = popen(command.c_str(), "r");
+  if (!pipe) {
+    return "popen failed!";
+  }
+  // read till end of process:
+  while (!feof(pipe))
+  {
+    // use buffer to read and add to result
+    if (fgets(buffer, 128, pipe) != NULL)
+      result += buffer;
+  }
+  _pclose(pipe);
+  return result;
+}
+
+void parsing(string cmd, vector <string> &comms, 
+             string call, string file, int mode)
+{
+  stringstream ss(cmd);
+  string word;
+  while (ss>>word)
+  {
+    comms.push_back(word); 
+  }
+  for (int i = 0; i < comms.size(); i++)
+  {
+    if (comms[i] == "|" || comms[i] == ">" || comms[i] == "<")
+	{ 
+      if (comms[i] == "|") mode = 1;
+	  if (comms[i] == ">") mode = 2;
+	  if (comms[i] == "<") mode = 3;
+
+      for (int j=0; j < i; j++)
+	  {
+        call = call + comms[j] + ' ';	  
+      }
+      //cout<<call<<endl;
+	  
+	  for (int k = i+1; k < comms.size(); k++)
+	  {
+        file = file + comms[k] + ' ';	  
+      }
+      //cout<<file<<endl;
+    }
+  }
 }
 
 int main()
 {
   string cmd, dir;
+  vector <string> commands;
   getCurrDir(dir);
   //cout<<dir<<endl;
-  /*
-  for (const auto & entry : std::filesystem::directory_iterator(dir))
-    std::cout << entry.dir() << endl;
-  */
   do
   {	
     cout<<"\n"<<dir<<"\n[CMD] : ";
     getline(cin, cmd);
-    if (cmd == "help")
+	parsing(cmd, commands);
+	/*
+	for (int i = 0; i < commands.size(); i++)
     {
-      helpCMD();
-    }
-    else if (cmd == "ls")
-    {
-      cout<<"still working on this function"<<endl;
-    }
-    else if (cmd == "exit")
-    {
-      cout << "Exiting..." << endl;
-    }
-    else cout<<"Invalid Command. " <<
-      "Type 'help' for a list of commands."<<endl;
+      cout<<commands[i]<<endl;
+    }*/
+	
+	/*
+	system(cmd.c_str());
+    string command;
+    cout << "> ";
+    getline(cin,command);
+    cout << "Command: " << command << endl;
+    string content = exec(command);
+    cout << content; */
   }
   while (cmd != "exit");
 }
