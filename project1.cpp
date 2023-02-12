@@ -1,5 +1,6 @@
-//Iris Carson, Antonio Castro & Jay Kempis
-//ENGG 126: Project 1
+//ENGG 126
+//Project 1: Rudimentary Shell Interpreter
+//by: Iris Carson, Antonio Castro, and Joshua Kempis
 
 #include <iostream>
 #include <stdexcept>
@@ -34,7 +35,7 @@ string exec(string command) {
 int main() {
    
    string command;
-   cout << "> ";
+   cout << "$ ";
    getline(cin,command);
 
    cout << "Command: " << command << endl;
