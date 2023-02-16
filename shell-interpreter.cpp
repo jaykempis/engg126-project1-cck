@@ -10,10 +10,11 @@
 #include <filesystem>
 #include <unistd.h>
 #include <windows.h>
+#include <stdexcept>
 
 using namespace std;
 
-void fileRead (string filename)
+void fileRead (string filename, string &contents)
 {
   string line;
   ifstream file (filename);
@@ -23,6 +24,7 @@ void fileRead (string filename)
     while (getline (file, line))
     {
 	  cout << line << endl;
+	  contents = contents + line + "\n";
     }
 	file.close();
   }
@@ -50,7 +52,7 @@ string exec(string command)
   string result = "";
 
   // Open pipe to file
-  FILE* pipe = popen(command.c_str(), "r");
+  FILE* pipe = _popen(command.c_str(), "r");
   if (!pipe) {
     return "popen failed!";
   }
@@ -66,7 +68,7 @@ string exec(string command)
 }
 
 void parsing(string cmd, vector <string> &comms, 
-             string call, string file, int mode)
+             string &c1, string &c2, int &mode)
 {
   stringstream ss(cmd);
   string word;
@@ -84,30 +86,59 @@ void parsing(string cmd, vector <string> &comms,
 
       for (int j=0; j < i; j++)
 	  {
-        call = call + comms[j] + ' ';	  
+        c1 = c1 + comms[j] + ' ';	  
       }
       //cout<<call<<endl;
 	  
 	  for (int k = i+1; k < comms.size(); k++)
 	  {
-        file = file + comms[k] + ' ';	  
+        c2 = c2 + comms[k] + ' ';	  
       }
       //cout<<file<<endl;
     }
+	else mode = 0;
   }
+}
+
+void forkFunc()
+{
+  //fork();
+  cout<<"Processing ID:"<<getpid()<<endl;
 }
 
 int main()
 {
-  string cmd, dir;
+  string cmd, dir, command, c1, c2, content;
   vector <string> commands;
+  int mode = 0;
   getCurrDir(dir);
   //cout<<dir<<endl;
   do
   {	
     cout<<"\n"<<dir<<"\n[CMD] : ";
     getline(cin, cmd);
-	parsing(cmd, commands);
+	parsing(cmd, commands, c1, c2, mode);
+	
+	if (mode == 1){
+      
+	}
+	else if (mode == 2){
+      content = exec(c1);
+	  //cout<< content;
+	  fileWrite(c1, content);
+    }
+	else if (mode == 3){
+      fileRead(c2, content);
+	  //cout<<content;
+	  //cout<<c1<<endl;
+	  //cout<<c2<<endl;
+	  cout<<exec(c1 +" "+ c2)<<endl;
+	}
+	else{
+	  content = exec(cmd);
+	  fileWrite("log.txt", content);
+      cout << content;
+    }
 	/*
 	for (int i = 0; i < commands.size(); i++)
     {
@@ -120,8 +151,8 @@ int main()
     cout << "> ";
     getline(cin,command);
     cout << "Command: " << command << endl;
-    string content = exec(command);
-    cout << content; */
+	*/
+    
   }
   while (cmd != "exit");
 }
