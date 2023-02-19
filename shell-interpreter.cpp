@@ -9,7 +9,7 @@
 #include <vector>
 #include <filesystem>
 #include <unistd.h>
-#include <windows.h>
+//#include <windows.h>
 #include <stdexcept>
 
 using namespace std;
@@ -52,7 +52,7 @@ string exec(string command)
   string result = "";
 
   // Open pipe to file
-  FILE* pipe = _popen(command.c_str(), "r");
+  FILE* pipe = popen(command.c_str(), "r");
   if (!pipe) {
     return "popen failed!";
   }
@@ -63,7 +63,7 @@ string exec(string command)
     if (fgets(buffer, 128, pipe) != NULL)
       result += buffer;
   }
-  _pclose(pipe);
+  pclose(pipe);
   return result;
 }
 
