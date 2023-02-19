@@ -4,18 +4,35 @@
 //--------------------------------------------------------------------
 #include <iostream>
 #include <string>
+#include <cstring>
 #include <sstream>
 #include <fstream>
 #include <vector>
-//#include <unistd.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/wait.h>
 #include <stdexcept>
 
 using namespace std;
 
+void getCurrDir (string &cDir)
+{
+  char tmp[256];
+  getcwd (tmp, 256);
+  //cout<<"Current working directory: "<< tmp << endl;
+  cDir = tmp;
+}
+
 void fileRead (string filename, string &contents)
 {
   string line;
-  ifstream file (filename);
+  //ifstream file (filename);
+  string oldfilename = filename;
+  getCurrDir(filename);
+  string filepath = filename + oldfilename;
+  cout << filepath << endl;
+  ifstream file; 
+  file.open(filename);
 
   if (file.is_open())
   {
@@ -26,7 +43,10 @@ void fileRead (string filename, string &contents)
     }
 	file.close();
   }
-  else cout <<"File does not exist"<<endl;
+  else 
+  {
+    cout <<"File does not exist"<<endl;
+  }
 }
 
 void fileWrite (string filename, string line)
@@ -36,22 +56,13 @@ void fileWrite (string filename, string line)
   file.close();
 }
 
-/*
-void getCurrDir (string &cDir)
-{
-  char tmp[256];
-  getcwd (tmp, 256);
-  //cout<<"Current working directory: "<< tmp << endl;
-  cDir = tmp;
-}*/
-
 string exec(string command) 
 {
   char buffer[128];
   string result = "";
 
   // Open pipe to file
-  FILE* pipe = _popen(command.c_str(), "r");
+  FILE* pipe = popen(command.c_str(), "r");
   if (!pipe) {
     return "popen failed!";
   }
@@ -62,7 +73,7 @@ string exec(string command)
     if (fgets(buffer, 128, pipe) != NULL)
       result += buffer;
   }
-  _pclose(pipe);
+  pclose(pipe);
   return result;
 }
 
@@ -104,42 +115,73 @@ void parsing(string cmd, vector <string> &comms,
   }
 }
 
+void pipeCommand(string cmd1, string cmd2) {
+  int fds[2]; // file descriptors
+  pipe(fds);
+  // child process #1
+  if (fork() == 0) {
+    // Reassign stdin to fds[0] end of pipe.
+    dup2(fds[0], STDIN_FILENO);
+    close(fds[1]);
+    close(fds[0]);
+    // Execute the second command.
+    // child process #2
+    if (fork() == 0) {
+        // Reassign stdout to fds[1] end of pipe.
+        dup2(fds[1], STDOUT_FILENO);
+        close(fds[0]);
+        close(fds[1]);
+        // Execute the first command.
+        exec(cmd1);
+    }
+    wait(NULL);
+    exec(cmd2);
+    }
+    close(fds[1]);
+    close(fds[0]);
+    wait(NULL);
+}
+
+
 int main()
 {
   string cmd, dir, command, c1, c2, content;
   vector <string> commands;
   int mode;
-  //getCurrDir(dir);
+  getCurrDir(dir);
   //cout<<dir<<endl;
   do
   {	
     cout<<"\n"<<dir<<"\n[CMD] : ";
     getline(cin, cmd);
-	parsing(cmd, commands, c1, c2, mode);
-	cout<<"MODE:"<<mode<<endl;
+	 parsing(cmd, commands, c1, c2, mode);
+	 cout<<"MODE:"<<mode<<endl;
 	
 	if (mode == 1){
 	  cout<<"Entered mode 1"<<endl;
-      cout << "C1: " << c1 << endl;
-      cout << "C2: " << c2 << endl;
-      //string newcommand = 
-      exec(cmd);
+     cout << "C1: " << c1 << endl;
+     cout << "C2: " << c2 << endl;
+
+     pipeCommand(c1,c2);
+
 	}
 	else if (mode == 2){
 	  cout<<"Entered mode 2"<<endl;
-      content = exec(c1);
+     content = exec(c1);
 	  fileWrite(c2, content);
-      cout << "C1: " << c1 << endl;
-      cout << "C2: " << c2 << endl;
+     cout << "C1: " << c1 << endl;
+     cout << "C2: " << c2 << endl;
     }
 	else if (mode == 3){
 	  cout<<"Entered mode 3"<<endl;
-      fileRead(c2, content);
-      
-	  cout<< exec(c1 +" "+ content) <<endl;
+     cout << "C1: " << c1 << endl;
+     cout << "C2: " << c2 << endl;
+     string readContent;
+     fileRead(c2, readContent);
+     cout << "Content: " << readContent << endl;
+	  cout<< exec(c1 + content) <<endl;
 
-      cout << "C1: " << c1 << endl;
-      cout << "C2: " << c2 << endl;
+   
 	}
 	else{
 	  cout<<"Entered mode 0"<<endl;
