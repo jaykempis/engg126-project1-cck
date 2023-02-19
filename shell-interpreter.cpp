@@ -120,8 +120,8 @@ int main()
 	parsing(cmd, commands, c1, c2, mode);
 	
 	if (mode == 1){ //  pipe (|) Command
-    content = exec(c1);
-	  fileWrite(c1, content);
+    content = exec(c1); //reads command before the operator
+	  fileWrite("log.txt", content); //writes the output in the log.txt
     fileRead("log.txt", content);
 	  cout<<exec(c2 +" "+ content)<<endl;
 	}
