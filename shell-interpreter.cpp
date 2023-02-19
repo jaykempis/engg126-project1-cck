@@ -70,20 +70,23 @@ void parsing(string cmd, vector <string> &comms,
 {
   stringstream ss(cmd);
   string word;
+  comms.clear();
   while (ss>>word)
   {
     comms.push_back(word); 
   }
-  mode = 0;
+  bool found = false;
   for (int i = 0; i < comms.size(); i++)
   {	
     if (comms[i] == "|" || comms[i] == ">" || comms[i] == "<")
 	{ 
       if (comms[i] == "|") mode = 1;
-	  if (comms[i] == ">") mode = 2;
-	  if (comms[i] == "<") mode = 3;
+	  else if (comms[i] == ">") mode = 2;
+	  else if (comms[i] == "<") mode = 3;
 	  
-      cout<<"found symbol:"<<comms[i]<<endl;
+	  found = true;
+      
+	  cout<<"found symbol:"<<comms[i]<<endl;
       for (int j=0; j < i; j++)
 	  {
         c1 = c1 + comms[j] + ' ';	  
@@ -96,6 +99,7 @@ void parsing(string cmd, vector <string> &comms,
       }
       //cout<<c2<<endl;
     }
+	if (found == false) mode = 0;
   }
 }
 
@@ -103,7 +107,7 @@ int main()
 {
   string cmd, dir, command, c1, c2, content;
   vector <string> commands;
-  int mode = 0;
+  int mode;
   getCurrDir(dir);
   //cout<<dir<<endl;
   do
