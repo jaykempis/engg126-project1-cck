@@ -7,9 +7,7 @@
 #include <sstream>
 #include <fstream>
 #include <vector>
-#include <filesystem>
 #include <unistd.h>
-//#include <windows.h>
 #include <stdexcept>
 
 using namespace std;
@@ -52,7 +50,7 @@ string exec(string command)
   string result = "";
 
   // Open pipe to file
-  FILE* pipe = popen(command.c_str(), "r");
+  FILE* pipe = _popen(command.c_str(), "r");
   if (!pipe) {
     return "popen failed!";
   }
@@ -63,7 +61,7 @@ string exec(string command)
     if (fgets(buffer, 128, pipe) != NULL)
       result += buffer;
   }
-  pclose(pipe);
+  _pclose(pipe);
   return result;
 }
 
@@ -76,34 +74,29 @@ void parsing(string cmd, vector <string> &comms,
   {
     comms.push_back(word); 
   }
+  mode = 0;
   for (int i = 0; i < comms.size(); i++)
-  {
+  {	
     if (comms[i] == "|" || comms[i] == ">" || comms[i] == "<")
 	{ 
       if (comms[i] == "|") mode = 1;
 	  if (comms[i] == ">") mode = 2;
 	  if (comms[i] == "<") mode = 3;
-
+	  
+      cout<<"found symbol:"<<comms[i]<<endl;
       for (int j=0; j < i; j++)
 	  {
         c1 = c1 + comms[j] + ' ';	  
       }
-      //cout<<call<<endl;
+      //cout<<c1<<endl;
 	  
 	  for (int k = i+1; k < comms.size(); k++)
 	  {
         c2 = c2 + comms[k] + ' ';	  
       }
-      //cout<<file<<endl;
+      //cout<<c2<<endl;
     }
-	else mode = 0;
   }
-}
-
-void forkFunc()
-{
-  //fork();
-  cout<<"Processing ID:"<<getpid()<<endl;
 }
 
 int main()
@@ -118,41 +111,27 @@ int main()
     cout<<"\n"<<dir<<"\n[CMD] : ";
     getline(cin, cmd);
 	parsing(cmd, commands, c1, c2, mode);
+	cout<<"MODE:"<<mode<<endl;
 	
 	if (mode == 1){
+	  cout<<"Entered mode 1"<<endl;
       
 	}
 	else if (mode == 2){
+	  cout<<"Entered mode 2"<<endl;
       content = exec(c1);
-	  //cout<< content;
 	  fileWrite(c1, content);
     }
 	else if (mode == 3){
-      fileRead(c2, content);
-	  //cout<<content;
-	  //cout<<c1<<endl;
-	  //cout<<c2<<endl;
+	  cout<<"Entered mode 3"<<endl;
 	  cout<<exec(c1 +" "+ c2)<<endl;
 	}
 	else{
+	  cout<<"Entered mode 0"<<endl;
 	  content = exec(cmd);
 	  fileWrite("log.txt", content);
       cout << content;
-    }
-	/*
-	for (int i = 0; i < commands.size(); i++)
-    {
-      cout<<commands[i]<<endl;
-    }*/
-	
-	/*
-	system(cmd.c_str());
-    string command;
-    cout << "> ";
-    getline(cin,command);
-    cout << "Command: " << command << endl;
-	*/
-    
+    }  
   }
   while (cmd != "exit");
 }
