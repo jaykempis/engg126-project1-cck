@@ -112,26 +112,23 @@ void parsing(string cmd, vector <string> &comms,
 void pipeCommand(char** cmd1, char** cmd2) {
   int fds[2];
   pipe(fds);
-  // child process #1
   if (fork() == 0) {
-    dup2(fds[0], STDIN_FILENO);
-    close(fds[1]);
-    close(fds[0]);
-    // Execute the second command.
-    // child process #2
-    if (fork() == 0) {
-        // Reassign stdout to fds[1] end of pipe.
+        // Reassign stdin to fds[0] end of pipe.
         dup2(fds[1], STDOUT_FILENO);
         close(fds[0]);
         close(fds[1]);
-        // Execute the first command.
         execvp(cmd1[0], cmd1);
     }
-    wait(NULL);
-    execvp(cmd2[0], cmd2);
+    // child process #2
+    if (fork() == 0) {
+        // Reassign stdout to fds[1] end of pipe.
+        dup2(fds[0], STDIN_FILENO);
+        close(fds[0]);
+        close(fds[1]);
+        execvp(cmd2[1], cmd2);
     }
-    close(fds[1]);
     close(fds[0]);
+    close(fds[1]);
     wait(NULL);
 }
 
@@ -155,18 +152,13 @@ int main()
       cout<<"Entered mode 1"<<endl;
       cout << "C1: " << c1 << endl;
       cout << "C2: " << c2 << endl;
-      char* arguments[2];
-      char* programArguments[1];
-      arguments[0] = new char[2];
-      arguments[1] = new char[2];
-      programArguments[0] = new char[1];
-      programArguments[0][0] = '\0';
-      for (int i = 0; i < 1; i++) 
-      {
-        arguments[0] = &c1.at(i);
-        arguments[1] = &c2.at(i);
-      }
-      pipeCommand(arguments[0],arguments[1]);
+      char * C1 = c1.data();
+      char * C2 = c2.data();
+
+      char *cmd1[] = {C1, NULL};
+      char *cmd2[] = {C2, NULL};
+
+      pipeCommand(cmd1,cmd2);
     }
 
     else if (mode == 2)
