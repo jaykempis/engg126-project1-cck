@@ -7,7 +7,9 @@
 #include <sstream>
 #include <fstream>
 #include <vector>
+#include <filesystem>
 #include <unistd.h>
+#include <windows.h>
 #include <stdexcept>
 
 using namespace std;
@@ -70,44 +72,45 @@ void parsing(string cmd, vector <string> &comms,
 {
   stringstream ss(cmd);
   string word;
-  comms.clear();
   while (ss>>word)
   {
     comms.push_back(word); 
   }
-  bool found = false;
   for (int i = 0; i < comms.size(); i++)
-  {	
+  {
     if (comms[i] == "|" || comms[i] == ">" || comms[i] == "<")
 	{ 
       if (comms[i] == "|") mode = 1;
-	  else if (comms[i] == ">") mode = 2;
-	  else if (comms[i] == "<") mode = 3;
-	  
-	  found = true;
-      
-	  cout<<"found symbol:"<<comms[i]<<endl;
+	  if (comms[i] == ">") mode = 2;
+	  if (comms[i] == "<") mode = 3;
+
       for (int j=0; j < i; j++)
 	  {
         c1 = c1 + comms[j] + ' ';	  
       }
-      //cout<<c1<<endl;
+      //cout<<call<<endl;
 	  
 	  for (int k = i+1; k < comms.size(); k++)
 	  {
         c2 = c2 + comms[k] + ' ';	  
       }
-      //cout<<c2<<endl;
+      //cout<<file<<endl;
     }
-	if (found == false) mode = 0;
+	else mode = 0;
   }
+}
+
+void forkFunc()
+{
+  //fork();
+  cout<<"Processing ID:"<<getpid()<<endl;
 }
 
 int main()
 {
   string cmd, dir, command, c1, c2, content;
   vector <string> commands;
-  int mode;
+  int mode = 0;
   getCurrDir(dir);
   //cout<<dir<<endl;
   do
@@ -115,27 +118,40 @@ int main()
     cout<<"\n"<<dir<<"\n[CMD] : ";
     getline(cin, cmd);
 	parsing(cmd, commands, c1, c2, mode);
-	cout<<"MODE:"<<mode<<endl;
 	
-	if (mode == 1){
-	  cout<<"Entered mode 1"<<endl;
-      
+	if (mode == 1){ //  pipe (|) Command
+    content = exec(c1);
+	  fileWrite(c1, content);
+    fileRead("log.txt", content);
+	  cout<<exec(c2 +" "+ content)<<endl;
 	}
-	else if (mode == 2){
-	  cout<<"Entered mode 2"<<endl;
-      content = exec(c1);
+	else if (mode == 2){ 
+    content = exec(c1);
 	  fileWrite(c1, content);
     }
 	else if (mode == 3){
-	  cout<<"Entered mode 3"<<endl;
+    fileRead(c2, content);
 	  cout<<exec(c1 +" "+ c2)<<endl;
 	}
 	else{
-	  cout<<"Entered mode 0"<<endl;
 	  content = exec(cmd);
 	  fileWrite("log.txt", content);
       cout << content;
-    }  
+    }
+	/*
+	for (int i = 0; i < commands.size(); i++)
+    {
+      cout<<commands[i]<<endl;
+    }*/
+	
+	/*
+	system(cmd.c_str());
+    string command;
+    cout << "> ";
+    getline(cin,command);
+    cout << "Command: " << command << endl;
+	*/
+    
   }
   while (cmd != "exit");
 }
