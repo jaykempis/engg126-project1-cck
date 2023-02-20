@@ -26,14 +26,9 @@ void getCurrDir (string &cDir)
 void fileRead (string filename, string &contents)
 {
   string line;
-  //ifstream file (filename);
-  string oldfilename = filename;
-  getCurrDir(filename);
-  string filepath = filename + oldfilename;
-  cout << filepath << endl;
-  ifstream file; 
-  file.open(filename);
-
+  ifstream file (filename, ios::in|ios::out|ios::binary);
+  
+    
   if (file.is_open())
   {
     while (getline (file, line))
@@ -45,13 +40,14 @@ void fileRead (string filename, string &contents)
   }
   else 
   {
-    cout <<"File does not exist"<<endl;
+    cout <<"No such file or directory"<<endl;
   }
 }
 
 void fileWrite (string filename, string line)
 {
-  ofstream file(filename);
+  ofstream file;
+  file.open(filename);
   file << line;
   file.close();
 }
@@ -115,31 +111,91 @@ void parsing(string cmd, vector <string> &comms,
   }
 }
 
-void pipeCommand(string cmd1, string cmd2) {
-  int fds[2]; // file descriptors
-  pipe(fds);
-  // child process #1
-  if (fork() == 0) {
-    // Reassign stdin to fds[0] end of pipe.
-    dup2(fds[0], STDIN_FILENO);
-    close(fds[1]);
-    close(fds[0]);
-    // Execute the second command.
-    // child process #2
-    if (fork() == 0) {
-        // Reassign stdout to fds[1] end of pipe.
-        dup2(fds[1], STDOUT_FILENO);
-        close(fds[0]);
-        close(fds[1]);
-        // Execute the first command.
-        exec(cmd1);
+int pipeFunc(string cmd1, string cmd2, int mode) 
+{
+  cout<<"CMD1: "<<cmd1<<" == CMD2: "<<cmd2<<endl;
+  int fd1[2]; // first pipe
+  int fd2[2]; // second pipe
+  
+  int pid;
+  string temp, content;
+  
+  if (pipe(fd1) < 0)
+  {
+    cout<<"Pipe Failed"<<endl;
+	return 1;
+  }
+  if (pipe(fd2) < 0) 
+  {
+    cout<<"Pipe Failed"<<endl;
+	return 1;
+  }
+  
+  pid = fork();
+  
+  if (mode == 3) fileRead(cmd2, temp);
+  else temp = exec(cmd1);
+  
+  char inbuf[temp.length()];
+  char outbuf[temp.length()];
+  
+  if (pid < 0) 
+  {
+    cout<<"Fork Failed"<<endl;
+	return 1;
+  }
+  //Parent Process
+  else if (pid > 0)
+  {
+    cout<<"IN:"<<mode<<endl;
+    close(fd1[0]); // Close reading end of first pipe
+    // Write input string and close writing end of first pipe.
+	write(fd1[1], temp.c_str(), temp.length()+1);
+	close(fd1[1]);
+	
+	wait(NULL);
+	read(fd2[0], outbuf, temp.length());
+	if (mode == 3) fileWrite(cmd1, outbuf);
+  }
+  
+  //Child process
+  else
+  {
+	cout<<"child process"<<endl;
+	// Read a string using first pipe
+	read(fd1[0], inbuf, temp.length());
+	inbuf[temp.length()] = '\0';
+	
+	if (mode == 2) 
+    {
+      cout << "Mode 2" << endl;
+      content = exec(cmd1);
+      fileWrite(cmd2, content);
     }
-    wait(NULL);
-    exec(cmd2);
+	
+	else if (mode == 1)
+    {
+      temp = exec(cmd2 + " " + "log.txt");
+	  cout <<temp<<endl;
+	  write(fd2[1], temp.c_str(), temp.length()+1);
     }
-    close(fds[1]);
-    close(fds[0]);
-    wait(NULL);
+	
+	else if (mode == 3)
+    {
+      temp = exec(cmd1 + " " + "log.txt");
+	  write(fd2[1], temp.c_str(), temp.length());
+    }
+
+    else fileWrite("log.txt", inbuf);
+	
+	//cout<<"BUF CONTENTS:\n"<<inbuf<<endl;
+    close(fd1[0]);
+    close(fd1[1]);
+    close(fd2[0]);
+	close(fd2[1]);
+	//exit(0);
+  }  
+  return 0;
 }
 
 
@@ -154,42 +210,19 @@ int main()
   {	
     cout<<"\n"<<dir<<"\n[CMD] : ";
     getline(cin, cmd);
-	 parsing(cmd, commands, c1, c2, mode);
-	 cout<<"MODE:"<<mode<<endl;
+	parsing(cmd, commands, c1, c2, mode);
+	cout<<"MODE:"<<mode<<endl;
 	
-	if (mode == 1){
-	  cout<<"Entered mode 1"<<endl;
-     cout << "C1: " << c1 << endl;
-     cout << "C2: " << c2 << endl;
-
-     pipeCommand(c1,c2);
-
-	}
-	else if (mode == 2){
-	  cout<<"Entered mode 2"<<endl;
-     content = exec(c1);
-	  fileWrite(c2, content);
-     cout << "C1: " << c1 << endl;
-     cout << "C2: " << c2 << endl;
-    }
-	else if (mode == 3){
-	  cout<<"Entered mode 3"<<endl;
-     cout << "C1: " << c1 << endl;
-     cout << "C2: " << c2 << endl;
-     string readContent;
-     fileRead(c2, readContent);
-     cout << "Content: " << readContent << endl;
-	  cout<< exec(c1 + content) <<endl;
-
-   
-	}
-	else{
-	  cout<<"Entered mode 0"<<endl;
-	  content = exec(cmd);
-	  fileWrite("log.txt", content);
+	if (mode == 0)
+    {
+      content = exec(cmd);
+      fileWrite("log.txt", content);
       cout << content;
-      cout << "C1: " << c1 << endl;
-      cout << "C2: " << c2 << endl;
+    }
+	
+    else
+    {
+      pipeFunc(c1, c2, mode);
     } 
     c1.clear();
     c2.clear();
