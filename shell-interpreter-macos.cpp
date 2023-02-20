@@ -115,7 +115,7 @@ int main()
   //cout<<dir<<endl;        //debugging cout for directory
   do
   {	
-    cout<<"\n"<<dir<<"\n$  ";
+    cout<<"\n"<<dir<<" $  ";
     getline(cin, cmd);
 	parsing(cmd, commands, c1, c2, mode);
 	
@@ -138,20 +138,6 @@ int main()
 	  fileWrite("log.txt", content);
       cout << content;
     }
-	/*
-	for (int i = 0; i < commands.size(); i++)
-    {
-      cout<<commands[i]<<endl;
-    }*/
-	
-	/*
-	system(cmd.c_str());
-    string command;
-    cout << "> ";
-    getline(cin,command);
-    cout << "Command: " << command << endl;
-	*/
-    
   }
   while (cmd != "exit");
 }
