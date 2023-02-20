@@ -9,7 +9,7 @@
 #include <vector>
 #include <filesystem>
 #include <unistd.h>
-// #include <windows.h>
+// #include <windows.h>  //commenting out for MacOS-ver
 #include <stdexcept>
 
 using namespace std;
@@ -112,10 +112,10 @@ int main()
   vector <string> commands;
   int mode = 0;
   getCurrDir(dir);
-  //cout<<dir<<endl;
+  //cout<<dir<<endl;        //debugging cout for directory
   do
   {	
-    cout<<"\n"<<dir<<"\n[CMD] : ";
+    cout<<"\n"<<dir<<"\n$  ";
     getline(cin, cmd);
 	parsing(cmd, commands, c1, c2, mode);
 	
