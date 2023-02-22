@@ -45,8 +45,13 @@ void fileRead (string filename, string &contents)
 
 void fileWrite (string filename, string line)
 {
+  /* 
   ofstream file;
   file.open(filename);
+  file << line;
+  file.close();
+  */
+  ofstream file(filename);
   file << line;
   file.close();
 }
