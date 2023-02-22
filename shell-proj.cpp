@@ -45,13 +45,19 @@ void fileRead (string filename, string &contents)
 
 void fileWrite (string filename, string line)
 {
-  /* 
+  string fn;
+  char *f = new char [256];
+  strcpy(f, filename.c_str());
+  for (int i = 0; i < filename.length()-1; i++)
+  {
+    fn = fn + f[i];
+  }
+  if (filename == "log.txt")
+  {
+    fn = filename;
+  }
   ofstream file;
-  file.open(filename);
-  file << line;
-  file.close();
-  */
-  ofstream file(filename);
+  file.open(fn);
   file << line;
   file.close();
 }
@@ -73,7 +79,9 @@ string exec(string command)
   {
     // use buffer to read and add to result
     if (fgets(buffer, 128, pipe) != NULL)
+    {
       result += buffer;
+    }
   }
   
   pclose(pipe);
@@ -98,15 +106,15 @@ void parsing(string cmd, vector <string> &comms,
     if (comms[i] == "|" || comms[i] == ">" || comms[i] == "<")
     { 
       if (comms[i] == "|")
-	  { 
+      { 
         mode = 1;
       }
-	  else if (comms[i] == ">") 
-	  { 
+      else if (comms[i] == ">") 
+      { 
         mode = 2;
       }
       else if (comms[i] == "<")  
-	  { 
+      { 
         mode = 3;
       }
 
@@ -124,7 +132,10 @@ void parsing(string cmd, vector <string> &comms,
       }
       //cout<<c2<<endl;
     }
-    if (found == false) mode = 0;
+    if (found == false)
+    {
+      mode = 0;
+    }
   }
 }
 
@@ -141,7 +152,7 @@ int pipeFunc(string cmd1, string cmd2, int mode)
     cout<<"Pipe Failed"<<endl;
     return 1;
   }
-  if (pipe(fd1) < 0) 
+  if (pipe(fd2) < 0) 
   {
     cout<<"Pipe Failed"<<endl;
     return 1;
@@ -177,7 +188,7 @@ int pipeFunc(string cmd1, string cmd2, int mode)
 
     wait(NULL);
     read(fd2[0], outbuf, temp.length());
-    if (mode == 3) fileWrite(cmd2, outbuf);
+
     close(fd2[0]);
   }
 
@@ -228,7 +239,7 @@ int main()
   //cout<<dir<<endl;
   do
   {  
-    cout<<"\n"<<dir<<"\n$ ";
+    cout<<"\n"<<dir<<"\n[CMD] : ";
     getline(cin, cmd);
     parsing(cmd, commands, c1, c2, mode);
     cout<<"==========================="<<endl;
