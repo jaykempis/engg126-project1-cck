@@ -228,7 +228,7 @@ int main()
   //cout<<dir<<endl;
   do
   {  
-    cout<<"\n"<<dir<<"\n[CMD] : ";
+    cout<<"\n"<<dir<<"\n$ ";
     getline(cin, cmd);
     parsing(cmd, commands, c1, c2, mode);
     cout<<"==========================="<<endl;
