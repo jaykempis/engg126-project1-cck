@@ -160,8 +160,7 @@ void threads_row(int Msize, int Nsize, int **A, int **B, int **C)
   vector<thread> threads;
   for (int i = 0; i < Msize; i++)
   {
-    threads.push_back(thread(matrixMult_row, i, Msize, 
-                             Nsize, A, B, C));
+    threads.push_back(thread(matrixMult_row, i, Msize, Nsize, A, B, C));
   }
   for (auto &th : threads)
   {
@@ -176,8 +175,7 @@ void threads_prod(int Msize, int Nsize, int **A, int **B, int **C)
   {
     for (int j = 0; j < Nsize; j++)
     {
-      threads.push_back(thread(matrixMult_prod, i, j, 
-                               Nsize, A, B, C));
+      threads.push_back(thread(matrixMult_prod, i, j, Nsize, A, B, C));
     }
   }
   for (auto &th : threads)
@@ -346,7 +344,7 @@ int main()
   cout<<"\n=====Output Matrix w/o threads====="<<endl;
   for (int i = 0; i < M; i++)
   {
-    for (int je = 0; j < M; j++)
+    for (int j = 0; j < M; j++)
     {
       cout<<C[i][j]<<" ";
     }
