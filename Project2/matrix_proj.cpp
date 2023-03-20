@@ -30,18 +30,6 @@ void randNumb(int row, int col, int **array, int seed)
       array[i][j] = rand() % 100; //range [0, 100]
     }
   }
-  /*
-  // Printing the 2D array
-  cout<<"\n=====Generated Random Numbers====="<<endl;
-  for (int i = 0; i < row; i++)
-  {
-    for (int j = 0; j < col; j++)
-    {
-      cout<<array[i][j]<<" ";
-    }
-  cout<<endl;
-  }
-  */
 }
 
 void fileWrite(int Msize, int Nsize, int **A, int **B)
