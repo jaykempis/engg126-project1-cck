@@ -117,6 +117,9 @@ This for loop will say that they are trying at same time. And remaining status w
         j++;
         cout<<"\n\n CURRENT j[" <<j <<"]\n\n"<<endl;
     }
+    else if(cmd == "exit"){
+        compltedPhilo = n;
+    }
 
     /*for(i=0;i<n;i++)
                 goForDinner(i);
