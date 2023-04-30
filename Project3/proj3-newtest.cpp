@@ -21,10 +21,7 @@ struct philosp{
 void helpCMD ()
 {
   cout<<"\nLists of possible commands: \n"
-      <<"* help            - displays the lists of commands \n"
-      <<"* debug           - turn debugging mode on \n"
-      <<"* pwd             - displays the current directory \n"
-      <<"* cd <dirname>    - changes directory \n"
+      <<"* n            - next step \n"
       <<"* exit            - closes the program"<<endl;
 }
 
@@ -119,6 +116,9 @@ This for loop will say that they are trying at same time. And remaining status w
     }
     else if(cmd == "exit"){
         compltedPhilo = n;
+    }
+    else if(cmd == "help"){
+        helpCMD();
     }
 
     /*for(i=0;i<n;i++)
