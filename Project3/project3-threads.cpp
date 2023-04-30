@@ -38,7 +38,8 @@ void helpCMD ()
 {
   cout<<"\nLists of possible commands: \n"
       <<"* r            - show report on the philosophers \n"
-      <<"* exit            - closes the program"<<endl;
+      <<"*help          - show list of commands \n"
+      <<"* exit         - closes the program"<<endl;
 }
 
 void phil(int ph, atomic<int>& ma, atomic<int>& mb) {
@@ -111,6 +112,7 @@ void showReport(string cmd)
       for (int i=1; i <=5; i++) cout << "Philosopher " << i << " has eaten " << Philostatus[i].eat << " times..." << endl;
       //cout << "Philosopher 1 has eaten " << Philostatus[0].eat << " times" << endl;
     }
+    else if(cmd == "help") helpCMD();
     else if(cmd == "exit") exit(0);
     else cout << "This Command is not recognized" << endl;
   }
