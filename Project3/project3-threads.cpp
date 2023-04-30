@@ -45,51 +45,24 @@ void phil(int ph, atomic<int>& ma, atomic<int>& mb) {
     int eat1, eat2, eat3, eat4, eat5;
 
     int duration=myrand(1000, 2000);
-    cout<<ph<<" is thinking for "<<duration<<" ms\n";
-
+    //cout<<ph<<" is thinking for "<<duration<<" ms\n";
+    Philostatus[ph].state = 1;
     this_thread::sleep_for(chrono::milliseconds(duration));
 
     lock(ma);
-    cout<<ph<<" got first chopstick\n";
-
-
+    //cout<<ph<<" got first chopstick\n";
+    Philostatus[ph].state = 2;
     this_thread::sleep_for(std::chrono::milliseconds(1000));
 
     lock(mb);
-    cout<<ph<<" got second chopstick\n";
+    //cout<<ph<<" got second chopstick\n";
+    Philostatus[ph].state = 3;
 
     duration=myrand(1000, 2000);
-    cout<<ph<<" is eating for "<<duration<<" ms\n";
+    //cout<<ph<<" is eating for "<<duration<<" ms\n";
     Philostatus[ph].eat += 1;
-    cout << "Philosopher " << ph << " has eaten " << Philostatus[ph].eat << " times..." << endl;
-
-    /*
-    if (ph == 1)
-    {
-      eat1 +=1;
-      cout << "Philosopher 1 has eaten " << eat1 << " times..." << endl;
-    }
-    else if (ph == 2)
-    {
-      eat2 +=1;
-      cout << "Philosopher 2 has eaten " << eat2 << " times..." << endl;
-    }
-    else if (ph == 3)
-    {
-      eat3 +=1;
-      cout << "Philosopher 3 has eaten " << eat3 << " times..." << endl;
-    }
-    else if (ph == 4)
-    {
-      eat4 +=1;
-      cout << "Philosopher 4 has eaten " << eat4 << " times..." << endl;
-    }
-    else if (ph == 5)
-    {
-      eat5 +=1;
-      cout << "Philosopher 5 has eaten " << eat5 << " times..." << endl;
-    }
-    */
+    Philostatus[ph].state = 4;
+    //cout << "Philosopher " << ph << " has eaten " << Philostatus[ph].eat << " times..." << endl;
     
     this_thread::sleep_for(std::chrono::milliseconds(duration));
 
@@ -113,8 +86,29 @@ void showReport(string cmd)
 
     if (cmd == "r")
     {
+      cout << "\n======State======: " << endl;    
+      for (int i=1; i <=5; i++)
+      {
+        if (Philostatus[i].state == 1)
+        {
+          cout << "Philosopher " << i << " is thinking..." << endl;
+        }
+        else if (Philostatus[i].state == 2)
+        {
+          cout << "Philosopher " << i << " has the first chopstick..." << endl;
+        }
+        else if (Philostatus[i].state == 3)
+        {
+          cout << "Philosopher " << i << " has the second chopstick..." << endl;
+        }
+        else if (Philostatus[i].state == 4)
+        {
+          cout << "Philosopher " << i << " is eating..." << endl;
+        }
+      }
+
       cout << "\n======Plates======: " << endl; 
-      for (int i=0; i <=4; i++) cout << "Philosopher " << i+1 << " has eaten " << Philostatus[i].eat << " times..." << endl;
+      for (int i=1; i <=5; i++) cout << "Philosopher " << i << " has eaten " << Philostatus[i].eat << " times..." << endl;
       //cout << "Philosopher 1 has eaten " << Philostatus[0].eat << " times" << endl;
     }
   }
@@ -156,40 +150,3 @@ int main() {
   
 
 }
-
-/*
-//report
-    cout << "Current State of Philosophers: " << endl;
-    if (state1 == 1) cout << "Philosopher 1 is thinking" << endl;
-    else if (state1 == 2) cout << "Philosopher 1 has first chopstick" << endl;
-    else if (state1 == 3) cout << "Philosopher 1 has second chopstick" << endl;
-    else if (state1 == 4) cout << "Philosopher 1 is eating" << endl;
-
-    if (state2 == 1) cout << "Philosopher 2 is thinking" << endl;
-    else if (state2 == 2) cout << "Philosopher 2 has first chopstick" << endl;
-    else if (state2 == 3) cout << "Philosopher 2 has second chopstick" << endl;
-    else if (state2 == 4) cout << "Philosopher 2 is eating" << endl;
-
-    if (state3 == 1) cout << "Philosopher 3 is thinking" << endl;
-    else if (state3 == 2) cout << "Philosopher 3 has first chopstick" << endl;
-    else if (state3 == 3) cout << "Philosopher 3 has second chopstick" << endl;
-    else if (state3 == 4) cout << "Philosopher 3 is eating" << endl;
-
-    if (state4 == 1) cout << "Philosopher 4 is thinking" << endl;
-    else if (state4 == 2) cout << "Philosopher 4 has first chopstick" << endl;
-    else if (state4 == 3) cout << "Philosopher 4 has second chopstick" << endl;
-    else if (state4 == 4) cout << "Philosopher 4 is eating" << endl;
-
-    if (state5 == 1) cout << "Philosopher 5 is thinking" << endl;
-    else if (state5 == 2) cout << "Philosopher 5 has first chopstick" << endl;
-    else if (state5 == 3) cout << "Philosopher 5 has second chopstick" << endl;
-    else if (state5 == 4) cout << "Philosopher 5 is eating" << endl;
-
-    cout << "\nNumber of time a Philosopher has eaten: " << endl;    
-    cout << "Philosopher 1 has eaten " << eat1 << " times" << endl;
-    cout << "Philosopher 2 has eaten " << eat2 << " times" << endl;
-    cout << "Philosopher 3 has eaten " << eat3 << " times" << endl;
-    cout << "Philosopher 4 has eaten " << eat4 << " times" << endl;
-    cout << "Philosopher 5 has eaten " << eat5 << " times" << endl;
-*/
-
