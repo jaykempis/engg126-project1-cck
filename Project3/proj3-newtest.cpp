@@ -7,6 +7,8 @@
 using namespace std;
  
 int compltedPhilo = 0,i;
+int exitStatus = 0;
+int philoCustomers[5]={0,0,0,0,0};
  
 struct fork{
     int taken;
@@ -18,6 +20,12 @@ struct philosp{
     int saturation;
 }Philostatus[n];
  
+int callRand(){
+    int roll;
+    roll = (rand() % 10) + 1;
+    cout << roll << "--------\n";
+    return roll;
+} 
 
 void helpCMD ()
 {
@@ -27,17 +35,29 @@ void helpCMD ()
 }
 
 void goForDinner(int philID){ //same like threads concept here cases implemented
-if(Philostatus[philID].left==10 && Philostatus[philID].right==10)
+if(Philostatus[philID].left==10 && Philostatus[philID].right==10){
         cout<<"Philosopher "<<philID+1<<" completed his dinner\n";
+        philoCustomers[philID] = 1;
+
+        if( callRand() > 7){
+            philoCustomers[philID] = 0;
+            Philostatus[philID].left = 0;
+            Philostatus[philID].right = 0;
+            Philostatus[philID].saturation = 0;
+            cout<<"Philosopher "<<philID+1<<" is hungry again\n";
+        }
+}
 //if already completed dinner
 else if(Philostatus[philID].left==1 && Philostatus[philID].right==1){
             //if just taken two forks
             cout<<"Philosopher "<<philID+1<<" took a bite, and is now eating\n";
+            philoCustomers[philID] = -1;
             Philostatus[philID].saturation += 1;
 
             if(Philostatus[philID].saturation == 3){
             cout<<"Philosopher "<<philID+1<<" completed his dinner\n";
                 Philostatus[philID].left = Philostatus[philID].right = 10; //remembering that he completed dinner by assigning value 10
+                philoCustomers[philID]=1;
                 int otherFork = philID-1;
     
                 if(otherFork== -1)
@@ -89,6 +109,13 @@ else if(Philostatus[philID].left==1 && Philostatus[philID].right==1){
                     }
         }else{}
 }
+int alldone(){
+    int sum=0;
+    for(int k=0; k<5; k++){
+        sum = sum+ philoCustomers[k];
+    }
+    return sum;
+}
  
 int main(){
 
@@ -99,7 +126,7 @@ int j=0;
 for(i=0;i<n;i++)
         ForkAvil[i].taken=Philostatus[i].left=Philostatus[i].right=0;
  
-while(compltedPhilo<n){
+while(exitStatus < n){
 /* Observe here carefully, while loop will run until all philosophers complete dinner
 Actually problem of deadlock occur only thy try to take at same time
 This for loop will say that they are trying at same time. And remaining status will print by go for dinner function
@@ -121,9 +148,19 @@ This for loop will say that they are trying at same time. And remaining status w
             j++;
             countin++;
         }while(countin < 5);
+
+    exitStatus = alldone();
+    cout << "System Check:" << endl;
+    for(int m=0; m<5; m++){
+        cout << philoCustomers[m] <<"|"<< Philostatus[m].left << "|"<< Philostatus[m].right<<endl;
+        
+    }
+    if(cmd == "exit"){
+        exitStatus = n;
+    }
     }
     else if(cmd == "exit"){
-        compltedPhilo = n;
+        exitStatus = n;
     }
     else if(cmd == "help"){
         helpCMD();
