@@ -1,3 +1,5 @@
+//ENGG 126: Project 3
+// Carson, Castro & Kempis
 
 #include <iostream>
 #include <thread>
@@ -32,6 +34,12 @@ struct philosp{
     int eat = 0;
 }Philostatus[n];
 
+void helpCMD ()
+{
+  cout<<"\nLists of possible commands: \n"
+      <<"* r            - show report on the philosophers \n"
+      <<"* exit            - closes the program"<<endl;
+}
 
 void phil(int ph, atomic<int>& ma, atomic<int>& mb) {
   bool run = true;
@@ -74,11 +82,7 @@ void showReport(string cmd)
   {
     string cmdline;
     cout << "\n[CMD]: " << endl;
-    getline(cin, cmdline);
-    stringstream cmdpipe(cmdline);
-    cmdpipe >> cmd;
-
-    cout << "Command: " << cmd << endl;
+    cin >> cmd;
 
     if (cmd == "r")
     {
@@ -107,7 +111,10 @@ void showReport(string cmd)
       for (int i=1; i <=5; i++) cout << "Philosopher " << i << " has eaten " << Philostatus[i].eat << " times..." << endl;
       //cout << "Philosopher 1 has eaten " << Philostatus[0].eat << " times" << endl;
     }
+    else if(cmd == "exit") exit(0);
+    else cout << "This Command is not recognized" << endl;
   }
+
 }
 
 int main() {
@@ -143,5 +150,7 @@ int main() {
     report.join();
 
   }
+  else if(start == "N" || start == "n") exit(0);
+  else cout << "This Command is not recognized" << endl;
   
 }
