@@ -33,13 +33,21 @@ void helpCMD ()
       <<"* n            - next step \n"
       <<"* exit            - closes the program"<<endl;
 }
+int alldone(){
+    int sum=0;
+    for(int k=0; k<5; k++){
+        sum = sum+ philoCustomers[k];
+    }
+    return sum;
+}
+ 
 
 void goForDinner(int philID){ //same like threads concept here cases implemented
 if(Philostatus[philID].left==10 && Philostatus[philID].right==10){
         cout<<"Philosopher "<<philID+1<<" completed his dinner\n";
         philoCustomers[philID] = 1;
 
-        if( callRand() > 7){
+        if(callRand() > 7 && alldone()>3){
             philoCustomers[philID] = 0;
             Philostatus[philID].left = 0;
             Philostatus[philID].right = 0;
@@ -109,14 +117,6 @@ else if(Philostatus[philID].left==1 && Philostatus[philID].right==1){
                     }
         }else{}
 }
-int alldone(){
-    int sum=0;
-    for(int k=0; k<5; k++){
-        sum = sum+ philoCustomers[k];
-    }
-    return sum;
-}
- 
 int main(){
 
 string cmdline, cmd;
