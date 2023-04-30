@@ -15,6 +15,7 @@ struct fork{
 struct philosp{
     int left;
     int right;
+    int saturation;
 }Philostatus[n];
  
 
@@ -31,17 +32,21 @@ if(Philostatus[philID].left==10 && Philostatus[philID].right==10)
 //if already completed dinner
 else if(Philostatus[philID].left==1 && Philostatus[philID].right==1){
             //if just taken two forks
+            cout<<"Philosopher "<<philID+1<<" took a bite, and is now eating\n";
+            Philostatus[philID].saturation += 1;
+
+            if(Philostatus[philID].saturation == 3){
             cout<<"Philosopher "<<philID+1<<" completed his dinner\n";
- 
-            Philostatus[philID].left = Philostatus[philID].right = 10; //remembering that he completed dinner by assigning value 10
-            int otherFork = philID-1;
- 
-            if(otherFork== -1)
-                otherFork=(n-1);
- 
-            ForkAvil[philID].taken = ForkAvil[otherFork].taken = 0; //releasing forks
-            cout<<"Philosopher "<<philID+1<<" released fork "<<philID+1<<" and fork "<<otherFork+1<<"\n";
-            compltedPhilo++;
+                Philostatus[philID].left = Philostatus[philID].right = 10; //remembering that he completed dinner by assigning value 10
+                int otherFork = philID-1;
+    
+                if(otherFork== -1)
+                    otherFork=(n-1);
+    
+                ForkAvil[philID].taken = ForkAvil[otherFork].taken = 0; //releasing forks
+                cout<<"Philosopher "<<philID+1<<" released fork "<<philID+1<<" and fork "<<otherFork+1<<"\n";
+                compltedPhilo++;
+            }
         }
         else if(Philostatus[philID].left==1 && Philostatus[philID].right==0){ //left already taken, trying for right fork
                 if(philID==(n-1)){
@@ -109,10 +114,13 @@ This for loop will say that they are trying at same time. And remaining status w
     cmdpipe >> cmd;
 
     if(cmd == "n"){
-        goForDinner(j%5);
-        cout<<"\nTill now num of philosophers completed dinner are "<<compltedPhilo<<"\n\n";
-        j++;
-        cout<<"\n\n CURRENT j[" <<j <<"]\n\n"<<endl;
+        int countin=0;
+        do{
+            goForDinner(j%5);
+            if (countin ==4) cout<<"\n move["<<j+1<<"] Till now num of philosophers completed dinner are "<<compltedPhilo<<"\n\n";
+            j++;
+            countin++;
+        }while(countin < 5);
     }
     else if(cmd == "exit"){
         compltedPhilo = n;
