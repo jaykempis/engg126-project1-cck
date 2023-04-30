@@ -144,7 +144,23 @@ This for loop will say that they are trying at same time. And remaining status w
         int countin=0;
         do{
             goForDinner(j%5);
-            if (countin ==4) cout<<"\n move["<<j+1<<"] Till now num of philosophers completed dinner are "<<compltedPhilo<<"\n\n";
+            if (countin ==4){
+                for(int zz=0; zz<5; zz++){
+                    switch(philoCustomers[zz]){
+                        case 0:
+                            cout << "PhD #" << zz+1 << "is thinking" << endl;
+                            break;
+                        
+                        case 1:
+                            cout << "PhD #" << zz+1 << "is full" << endl;
+                            break;
+
+                        case -1:
+                            cout << "PhD #" << zz+1 << "is eating" << endl;
+                            break;
+                    }
+                }
+            }
             j++;
             countin++;
         }while(countin < 5);
