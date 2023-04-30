@@ -18,6 +18,7 @@ struct philosp{
     int left;
     int right;
     int saturation;
+    int plates;
 }Philostatus[n];
  
 int callRand(){
@@ -47,7 +48,7 @@ if(Philostatus[philID].left==10 && Philostatus[philID].right==10){
         cout<<"Philosopher "<<philID+1<<" completed his dinner\n";
         philoCustomers[philID] = 1;
 
-        if(callRand() > 7 && alldone()>3){
+        if(callRand() > 6 && alldone()>2){
             philoCustomers[philID] = 0;
             Philostatus[philID].left = 0;
             Philostatus[philID].right = 0;
@@ -66,6 +67,7 @@ else if(Philostatus[philID].left==1 && Philostatus[philID].right==1){
             cout<<"Philosopher "<<philID+1<<" completed his dinner\n";
                 Philostatus[philID].left = Philostatus[philID].right = 10; //remembering that he completed dinner by assigning value 10
                 philoCustomers[philID]=1;
+                Philostatus[philID].plates +=1;
                 int otherFork = philID-1;
     
                 if(otherFork== -1)
@@ -139,6 +141,7 @@ This for loop will say that they are trying at same time. And remaining status w
     getline(cin, cmdline);
     stringstream cmdpipe(cmdline);
     cmdpipe >> cmd;
+    cout<<"[ROUND #"<<j/5<<"]=========\n\n"<<endl;
 
     if(cmd == "n"){
         int countin=0;
@@ -168,7 +171,7 @@ This for loop will say that they are trying at same time. And remaining status w
     exitStatus = alldone();
     cout << "System Check:" << endl;
     for(int m=0; m<5; m++){
-        cout << philoCustomers[m] <<"|"<< Philostatus[m].left << "|"<< Philostatus[m].right<<endl;
+        cout << philoCustomers[m] <<"|"<< Philostatus[m].left << "|"<< Philostatus[m].right<< "|"<< Philostatus[m].plates<<endl;
         
     }
     if(cmd == "exit"){
