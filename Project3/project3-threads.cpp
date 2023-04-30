@@ -1,5 +1,4 @@
-//https://www.modernescpp.com/index.php/dining-philiosophers-problem-i
-// dp_5.cpp
+
 #include <iostream>
 #include <thread>
 #include <chrono>
@@ -39,10 +38,7 @@ void phil(int ph, atomic<int>& ma, atomic<int>& mb) {
   while(run) {
 
     //philosopaher states
-    //int state1, state2, state3, state4, state5;
     //1 = thinking, 2 = has first chopstick, 3 = has second chopstick, 4 = eating
-
-    int eat1, eat2, eat3, eat4, eat5;
 
     int duration=myrand(1000, 2000);
     //cout<<ph<<" is thinking for "<<duration<<" ms\n";
@@ -115,7 +111,7 @@ void showReport(string cmd)
 }
 
 int main() {
-  cout<<"dp_5\n";
+  cout<<"======Dining Philosophers======\n";
   srand(time(nullptr));
 
   atomic<int> m1{0}, m2{0}, m3{0}, m4{0}, m5{0};
@@ -128,7 +124,6 @@ int main() {
   if (start == "Y" || start == "y")
   {
 
-
     cout << "Dinner Has Begun " << endl;
 
     thread t1([&] {phil(1, m1, m2);});
@@ -137,6 +132,7 @@ int main() {
     thread t4([&] {phil(4, m4, m5);});
     thread t5([&] {phil(5, m1, m5);});
 
+    //thread for user commands
     thread report([&] {showReport(cmd);});
 
     t1.join();
@@ -148,5 +144,4 @@ int main() {
 
   }
   
-
 }
